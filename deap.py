@@ -1,4 +1,4 @@
-import _pickle as cPickle
+import pickle as cPickle
 import numpy as np
 import torch
 import os
@@ -7,6 +7,7 @@ from torch_geometric.data import Data
 from torch_geometric.data import Dataset
 from torch_geometric.data import Batch
 import torch.nn.functional as F
+import scipy.io
 
 
 fs = 128  # 采样频率
@@ -36,7 +37,7 @@ def data_divide(data, label):
     """
     window_size = 6  # 窗口大小
     step = 3  # 窗口滑动的步长
-    num = (60 - window_size) // step + 1  # 分割成的段数
+    num = ((60 - window_size) // step) + 1  # 分割成的段数
 
     divided_data = []
     for i in range(0, num * step, step):
@@ -195,7 +196,7 @@ class DeapDataset(Dataset):
     def process(self):
         for i in range(len(self.raw_paths)):
             with open(self.raw_paths[i], 'rb') as f:
-                x = cPickle.load(f, encoding='iso-8859-1')
+                x = scipy.io.loadmat(f)
             processed_data = data_processing(x['data'], x['labels'])
             torch.save(processed_data, self.processed_paths[i])
 
